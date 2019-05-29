@@ -14,7 +14,7 @@ class Joueur {
 		main.addAll(InitialiserPioche.listMonument());
 		main.add(new Etablissement("Champ de blé", 1, "Agriculture", 1));
 		main.add(new Etablissement("Boulangerie", 1, "Magasin", 2, 3));
-		this.argent = 20;
+		this.argent = 3;
 
 	}
 

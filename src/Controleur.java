@@ -128,4 +128,12 @@ public class Controleur {
 		new Controleur();
 	}
 
+	void argentChange(Joueur j, String etab, int prevArgent) {
+		cui.argentChange(j, etab, prevArgent);
+	}
+
+	void argentVole(Joueur jVole, Joueur jVoleur, String etab, int nbPieces) {
+		cui.argentVole(jVole, jVoleur, etab, nbPieces);
+	}
+
 }

@@ -55,33 +55,37 @@ abstract class EffetCarte {
 
 	private static void champDeBle(Controleur ctrl) {
 		for(Joueur j : ctrl.getListeJoueurs()) {
+			int argentJoueur = j.getArgent();
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Champ de blé") ) {
 					j.ajouterArgent(1);
 				}
 			}
+			if(argentJoueur != j.getArgent()) { ctrl.argentChange(j,"Champ de blé",argentJoueur); }
 		}
-	}
+	} // Fait
 
 	private static void ferme(Controleur ctrl) {
 		for(Joueur j : ctrl.getListeJoueurs()) {
+			int argentJoueur = j.getArgent();
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Ferme") ) {
 					j.ajouterArgent(1);
 				}
 			}
+			if(argentJoueur != j.getArgent()) { ctrl.argentChange(j,"Ferme",argentJoueur); }
 		}
-	}
+	} // Fait
 
 	private static void boulangerie(Controleur ctrl) {
-		for(Joueur j : ctrl.getListeJoueurs()) {
-			for(Carte c : j.getMain()) {
-				if( c.getNom().equals("Boulangerie") ) {
-					j.ajouterArgent(1);
-				}
+		int argentJoueur = ctrl.getJoueurActif().getArgent();
+		for(Carte c : ctrl.getJoueurActif().getMain()) {
+			if( c.getNom().equals("Boulangerie")) {
+				ctrl.getJoueurActif().ajouterArgent(1);
 			}
 		}
-	}
+		if(argentJoueur != ctrl.getJoueurActif().getArgent()) { ctrl.argentChange(ctrl.getJoueurActif(),"Boulangerie",argentJoueur); }
+	} // Fait
 
 	private static void cafe(Controleur ctrl) {
 		ArrayList<Joueur> listeJoueurs = ctrl.getListeJoueurs();
@@ -91,6 +95,7 @@ abstract class EffetCarte {
 			Joueur j = listeJoueurs.get(i);
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Café") && joueurActif.getArgent() > 0 ) {
+					ctrl.argentVole(joueurActif, j, "Café", 1);
 					joueurActif.ajouterArgent(-1);
 					j.ajouterArgent(1);
 				}
@@ -100,30 +105,35 @@ abstract class EffetCarte {
 			Joueur j = listeJoueurs.get(i);
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Café") && joueurActif.getArgent() > 0 ) {
+					ctrl.argentVole(joueurActif, j, "Café", 1);
 					joueurActif.ajouterArgent(-1);
 					j.ajouterArgent(1);
 				}
 			}
 		}
-	}
+	} // Pas terminé
 
 	private static void superette(Controleur ctrl) {
+		int argentJoueur = ctrl.getJoueurActif().getArgent();
 		for(Carte c : ctrl.getJoueurActif().getMain()) {
 			if( c.getNom().equals("Supérette")) {
 				ctrl.getJoueurActif().ajouterArgent(3);
 			}
 		}
-	}
+		if(argentJoueur != ctrl.getJoueurActif().getArgent()) { ctrl.argentChange(ctrl.getJoueurActif(),"Superette",argentJoueur); }
+	} // Fait
 
 	private static void foret(Controleur ctrl) {
 		for(Joueur j : ctrl.getListeJoueurs()) {
+			int argentJoueur = j.getArgent();
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Forêt") ) {
 					j.ajouterArgent(1);
 				}
 			}
+			if(argentJoueur != j.getArgent()) { ctrl.argentChange(j,"Forêt",argentJoueur); }
 		}
-	}
+	} // Fait
 
 	private static void stade(Controleur ctrl) {
 		for( Carte c : ctrl.getJoueurActif().getMain() ) {
@@ -141,7 +151,7 @@ abstract class EffetCarte {
 				}
 			}
 		}
-	}
+	} // Pas terminé
 
 	private static void chaineDeTele(Controleur ctrl) {
 
@@ -185,13 +195,14 @@ abstract class EffetCarte {
 				}
 			}
 		}
-	}
+	} // Pas terminé
 
 	private static void centreDaffaires(Controleur ctrl) {
 
-	} // A COMPLETER ICI
+	} // RIEN DE FAIT ICI
 
 	private static void fromagerie(Controleur ctrl) {
+		int argentJoueur = ctrl.getJoueurActif().getArgent();
 		for(Carte c : ctrl.getJoueurActif().getMain()) {
 			if( c.getNom().equals("Fromagerie")) {
 				int nbElevage = 0;
@@ -203,9 +214,11 @@ abstract class EffetCarte {
 				ctrl.getJoueurActif().ajouterArgent(nbElevage*3);
 			}
 		}
-	}
+		if(argentJoueur != ctrl.getJoueurActif().getArgent()) { ctrl.argentChange(ctrl.getJoueurActif(),"Fromagerie",argentJoueur); }
+	} // Fait
 
 	private static void fabriqueDeMeubles(Controleur ctrl) {
+		int argentJoueur = ctrl.getJoueurActif().getArgent();
 		for(Carte c : ctrl.getJoueurActif().getMain()) {
 			if( c.getNom().equals("Fabrique de meubles")) {
 				int nbRessources = 0;
@@ -217,17 +230,20 @@ abstract class EffetCarte {
 				ctrl.getJoueurActif().ajouterArgent(nbRessources*3);
 			}
 		}
-	}
+		if(argentJoueur != ctrl.getJoueurActif().getArgent()) { ctrl.argentChange(ctrl.getJoueurActif(),"Fabrique de meubles",argentJoueur); }
+	} // Fait
 
 	private static void mine(Controleur ctrl) {
 		for(Joueur j : ctrl.getListeJoueurs()) {
+			int argentJoueur = j.getArgent();
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Mine") ) {
 					j.ajouterArgent(5);
 				}
 			}
+			if(argentJoueur != j.getArgent()) { ctrl.argentChange(j,"Mine",argentJoueur); }
 		}
-	}
+	} // Fait
 
 	private static void restaurant(Controleur ctrl) {
 		ArrayList<Joueur> listeJoueurs = ctrl.getListeJoueurs();
@@ -237,9 +253,11 @@ abstract class EffetCarte {
 			Joueur j = listeJoueurs.get(i);
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Restaurant") && joueurActif.getArgent() >= 2 ) {
+					ctrl.argentVole(joueurActif, j, "Restaurant", 2);
 					joueurActif.ajouterArgent(-2);
 					j.ajouterArgent(2);
 				} else if(c.getNom().equals("Restaurant") && joueurActif.getArgent() >= 1) {
+					ctrl.argentVole(joueurActif, j, "Restaurant", 1);
 					joueurActif.ajouterArgent(-1);
 					j.ajouterArgent(1);
 				}
@@ -249,24 +267,32 @@ abstract class EffetCarte {
 			Joueur j = listeJoueurs.get(i);
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Restaurant") && joueurActif.getArgent() > 0 ) {
+					ctrl.argentVole(joueurActif, j, "Restaurant", 2);
 					joueurActif.ajouterArgent(-2);
 					j.ajouterArgent(2);
+				} else if(c.getNom().equals("Restaurant") && joueurActif.getArgent() >= 1) {
+					ctrl.argentVole(joueurActif, j, "Restaurant", 1);
+					joueurActif.ajouterArgent(-1);
+					j.ajouterArgent(1);
 				}
 			}
 		}
-	}
+	} // Pas terminé
 
 	private static void verger(Controleur ctrl) {
 		for(Joueur j : ctrl.getListeJoueurs()) {
+			int argentJoueur = j.getArgent();
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Verger") ) {
 					j.ajouterArgent(3);
 				}
 			}
+			if(argentJoueur != j.getArgent()) { ctrl.argentChange(j,"Verger",argentJoueur); }
 		}
-	}
+	} // Fait
 
 	private static void marcheDeFruitsEtLegumes(Controleur ctrl) {
+		int argentJoueur = ctrl.getJoueurActif().getArgent();
 		for(Carte c : ctrl.getJoueurActif().getMain()) {
 			if( c.getNom().equals("Marché de fruits et légumes")) {
 				int nbAgriculture = 0;
@@ -278,6 +304,7 @@ abstract class EffetCarte {
 				ctrl.getJoueurActif().ajouterArgent(nbAgriculture*2);
 			}
 		}
-	}
+		if(argentJoueur != ctrl.getJoueurActif().getArgent()) { ctrl.argentChange(ctrl.getJoueurActif(),"Marché de fuits et légumes",argentJoueur); }
+	} // Fait
 
 }

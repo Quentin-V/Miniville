@@ -2,9 +2,11 @@
 public class Monument extends Carte{
 
 	boolean construit;
+	String effet;
 
-	Monument(String nom, int coutConstruction) {
+	Monument(String nom, int coutConstruction, String effet) {
 		super(nom, coutConstruction);
+		this.effet = effet;
 		construit = false;
 	}
 
@@ -21,4 +23,11 @@ public class Monument extends Carte{
 		return retour;
 	}
 
+	String getEffet() {
+		return effet;
+	}
+
+	void setConstruit(boolean construit) {
+		this.construit = construit;
+	}
 }

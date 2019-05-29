@@ -20,4 +20,8 @@ class Carte {
 	public String toString() {
 		return getNom();
 	}
+
+	boolean equals(Carte carte) {
+		return getNom().equals(carte.getNom());
+	}
 }

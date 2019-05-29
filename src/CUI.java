@@ -12,7 +12,7 @@ class CUI {
     }
 
     void start() {
-        int nbJoueurs = 0;
+        int nbJoueurs;
         while(true) {
             System.out.print("Nombre de joueurs : ");
             try {
@@ -49,6 +49,8 @@ class CUI {
 
     void lancerTour(Joueur joueurActif) {
 
+        for(int i = 0; i < 100; i++) System.out.println();
+
         this.joueurActif = joueurActif;
 
         System.out.print("Tour de " + joueurActif.getNom() + " : \n\n");
@@ -61,7 +63,7 @@ class CUI {
     void afficherDe(int[] resultatDe) {
         if(resultatDe[1] == 0) {
             System.out.println(joueurActif.getNom() + ", vous avez fait : " + resultatDe[0]);
-        }else {System.out.println(joueurActif.getNom() + ", vous avez fait : " + resultatDe[0] + " et " + resultatDe[1] );}
+        }else {System.out.println(joueurActif.getNom() + ", vous avez fait : " + resultatDe[0] + " et " + resultatDe[1] + " (" + (resultatDe[0] + resultatDe[1]) + ")");}
     }
 
     boolean veutJouer2Des() {
@@ -71,35 +73,26 @@ class CUI {
                 try {
                     Scanner sc = new Scanner(System.in);
                     char choix = sc.next().charAt(0);
-                    sc.close();
-                    if(Character.toLowerCase(choix) == 'o') {
-                        return true;
-                    }
-                    break;
+                    System.out.println();
+                    return Character.toLowerCase(choix) == 'o';
                 } catch(Exception e) {System.out.println("Erreur, veuillez saisir 'O' ou 'N' !");}
             }
-
-            System.out.println();
-
         }
         return false;
     }
 
     boolean veutConstruire() {
         if(joueurActif.getArgent() > 0) {
-            Scanner sc = new Scanner(System.in);
             System.out.print("Voulez vous construire (O/N) : ");
             while(true) {
                 try {
+                    Scanner sc = new Scanner(System.in);
                     char choix = sc.next().charAt(0);
-                    if(Character.toLowerCase(choix) == 'o') {
-                        return true;
-                    }
-                    break;
-                } catch(Exception e) {System.out.println("Erreur, veuillez saisir 'O' ou 'N' !");}
+                    System.out.println();
+                    return Character.toLowerCase(choix) == 'o';
+                } catch(Exception e) {System.out.println("Erreur, veuillez saisir 'O' ou 'N' !"); e.printStackTrace();}
             }
         }
-        System.out.println();
         return false;
     }
 
@@ -107,23 +100,34 @@ class CUI {
 
         int argent = joueurActif.getArgent();
         int indice = 1;
-        ArrayList<String> proposes = new ArrayList<>();
+        ArrayList<Carte> proposes = new ArrayList<>();
 
         System.out.println("Vous avez " + argent + " pièces.");
         System.out.println("Liste des batiments que vous pouvez acheter : \n");
         for(Etablissement etab : ctrl.getPioche()) {
-            if(etab.getCoutConstruction() <= argent && !proposes.contains(etab.getNom())) {
-                proposes.add(etab.getNom());
+            if(etab.getCoutConstruction() <= argent && !etabEstEnregistre(etab, proposes)) {
+                proposes.add(etab);
                 String nomEtab    = String.format("%30s", etab.getNom());
                 String coutEtab   = String.format("%9s",  etab.getCoutConstruction() + " pièces");
                 String numActEtab = String.format("%.8s", etab.getNumerosActivation());
                 String sIndice    = String.format("%2d",  indice);
                 System.out.println("\t" + sIndice + " : " + nomEtab + " | " + coutEtab + " | Activé par : " + numActEtab);
+                indice++;
             }
-            indice++;
+        }
+        for(Carte c : joueurActif.getMain()) {
+            if(c.getCoutConstruction() <= joueurActif.getArgent() && c instanceof Monument && !((Monument) c).estConstruit()) {
+                proposes.add(c);
+                String nomEtab    = String.format("%30s", c.getNom());
+                String coutEtab   = String.format("%9s" , c.getCoutConstruction() + " pièces");
+                String effet      = String.format("%s"  , ((Monument) c).getEffet());
+                String sIndice    = String.format("%2d" , indice);
+                System.out.println("\t" + sIndice + " : " + nomEtab + " | " + coutEtab + " | Effet : " + effet);
+                indice++;
+            }
         }
 
-        System.out.print("Saisissez le numéro du batiment que vous souhaitez acheter (-1 pour annuler) : ");
+        System.out.print("\nSaisissez le numéro du batiment que vous souhaitez acheter (-1 pour annuler) : ");
         while(true) {
             int choix = -1;
             try {
@@ -135,16 +139,22 @@ class CUI {
                     break;
                 }
                 choix--;
-                for(Etablissement etab : ctrl.getPioche()) {
-                    if(etab.getNom().equals(proposes.get(choix))) {
-                        joueurActif.ajouteMain(etab);
-                        ctrl.removeFromPioche(etab);
+                for(Carte c : joueurActif.getMain()) {
+                    if(c.getNom().equals(proposes.get(choix).getNom())) {
+                        if(c instanceof Etablissement) {
+                            joueurActif.ajouteMain(c);
+                            ctrl.removeFromPioche((Etablissement) c);
+                        } else {
+                            ((Monument) c).setConstruit(true);
+                        }
+                        ctrl.getJoueurActif().ajouterArgent(-1*c.getCoutConstruction());
                         break;
                     }
                 }
+                System.out.println();
             }catch (Exception e) {
                 System.out.print("Veuillez saisir un chiffre correspondant au batiment \n" +
-                        "que vous voulez construire, -1 pour annuler.");
+                        "que vous voulez construire, -1 pour annuler : ");
             }
             if(choix >= 0 && choix < proposes.size()) break;
         }
@@ -158,13 +168,12 @@ class CUI {
                 try {
                     Scanner sc = new Scanner(System.in);
                     char choixRelancer = sc.next().charAt(0);
-                    sc.close();
                     System.out.println();
                     if(Character.toLowerCase(choixRelancer) == 'o') {
                         System.out.println("Vous relancez vos dés !");
                         return true;
                     }
-                    break;
+                    return false;
                 } catch(Exception e) {System.out.println("Erreur, veuillez saisir 'O' ou 'N' !"); e.printStackTrace();}
             }
         }
@@ -175,10 +184,14 @@ class CUI {
         System.out.println("Vous avez fait un double ! Vous allez rejouer à la fin de votre tour.");
     }
 
-    void afficherMain() {
+    private void afficherMain() {
         ArrayList<Carte> cartesUniques = new ArrayList<>();
 
-
+        for(Carte c : joueurActif.getMain()) {
+            if(!carteEstEnregistree(c,cartesUniques)) {
+                cartesUniques.add(c);
+            }
+        }
 
         for (Carte carteUnique: cartesUniques) {
             int nbCetteCarte = 0;
@@ -189,8 +202,39 @@ class CUI {
             }
             if(carteUnique instanceof Monument) {
                 System.out.println(carteUnique);
-            } else {System.out.println(nbCetteCarte + " | " + carteUnique.getNom());}
+            } else if(carteUnique instanceof Etablissement) {
+                String nomCarte = String.format("%-27s", carteUnique.getNom());
+                System.out.println(nbCetteCarte + " | " + nomCarte + " | Activation : " + ((Etablissement) carteUnique).getNumerosActivation());
+            }
         }
+        System.out.println("\n\n");
+    }
+
+    void argentChange(Joueur j, String etab, int prevArgent) {
+        int gain = j.getArgent() - prevArgent;
+        System.out.println(j.getNom() + " a gagné " + gain + " pièce grâce à l'activation de " + etab);
+    }
+
+    void argentVole(Joueur joueurVole, Joueur joueurVoleur, String etab, int nbPieces) {
+        System.out.println(joueurVoleur.getNom() + " a pris " + nbPieces + " pièce(s) à " + joueurVole.getNom() + " grâce à l'activation de " + etab);
+    }
+
+    private boolean carteEstEnregistree(Carte carte, ArrayList<Carte> lCartes) {
+        for(Carte c : lCartes) {
+            if(c.equals(carte)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean etabEstEnregistre(Etablissement etab, ArrayList<Carte> lEtab) {
+        for(Carte c : lEtab) {
+            if(c.equals(etab)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

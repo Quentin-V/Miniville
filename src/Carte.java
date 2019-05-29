@@ -17,7 +17,6 @@ class Carte {
 		return coutConstruction;
 	}
 
-	@Override
 	public String toString() {
 		return getNom();
 	}

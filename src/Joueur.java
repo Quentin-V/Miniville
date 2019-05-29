@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Joueur {
+class Joueur {
 
 	private String nom;
 	private ArrayList<Carte> main;
@@ -11,7 +11,7 @@ public class Joueur {
 
 		this.nom = nom;
 		main =  new ArrayList<Carte>();
-		for(Monument m : InitialiserPioche.listMonument()) main.add(m);
+		main.addAll(InitialiserPioche.listMonument());
 		main.add(new Etablissement("Champ de blé", 1, "Agriculture", 1));
 		main.add(new Etablissement("Boulangerie", 1, "Magasin", 2, 3));
 		this.argent = 20;
@@ -21,13 +21,7 @@ public class Joueur {
 	String getNom() {return this.nom;}
 
 	ArrayList<Carte> getMain() {
-		ArrayList<Carte> mainCopie = new ArrayList<>();
-
-		for(Carte c : main) {
-			mainCopie.add(c);
-		}
-
-		return mainCopie;
+		return new ArrayList<>(main);
 	}
 
 	ArrayList<String> getNomMonumentsConstruits() {

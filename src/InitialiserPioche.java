@@ -30,7 +30,7 @@ abstract class InitialiserPioche
 
 	static ArrayList<Monument> listMonument()
 	{
-		listMon = new ArrayList<Monument>();
+		listMon = new ArrayList<>();
 
 		listMon.add(new Monument("Gare",               4 ));
 		listMon.add(new Monument("Centre commercial",  10));

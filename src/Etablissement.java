@@ -36,4 +36,8 @@ class Etablissement extends Carte {
 	String getSymbole() {
 		return symbole;
 	}
+
+	public boolean equals(Carte carte) {
+		return getNom().equals(carte.getNom());
+	}
 }

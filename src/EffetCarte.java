@@ -51,6 +51,8 @@ abstract class EffetCarte {
 
 	}
 
+
+
 	private static void champDeBle(Controleur ctrl) {
 		for(Joueur j : ctrl.getListeJoueurs()) {
 			for(Carte c : j.getMain()) {
@@ -143,9 +145,9 @@ abstract class EffetCarte {
 
 	private static void chaineDeTele(Controleur ctrl) {
 
-		System.out.println("Saisissez le nom du joueur à qui vous voulez voler 5 pièces :");
 		for( Carte c : ctrl.getJoueurActif().getMain() ) {
 			if( c.getNom().equals("Chaîne de télévision") ) {
+				System.out.println("Saisissez le nom du joueur à qui vous voulez voler 5 pièces :");
 				for(Joueur j : ctrl.getListeJoueurs()) {
 					if( j != ctrl.getJoueurActif() ) {
 						String nomJoueur = String.format("%20s", j.getNom());
@@ -187,7 +189,7 @@ abstract class EffetCarte {
 
 	private static void centreDaffaires(Controleur ctrl) {
 
-	}
+	} // A COMPLETER ICI
 
 	private static void fromagerie(Controleur ctrl) {
 		for(Carte c : ctrl.getJoueurActif().getMain()) {

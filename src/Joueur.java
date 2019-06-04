@@ -31,7 +31,6 @@ class Joueur {
 			if(c instanceof Monument && ((Monument)c).estConstruit())
 				nomMonumentsConstruits.add(c.getNom());
 		}
-
 		return nomMonumentsConstruits;
 	}
 

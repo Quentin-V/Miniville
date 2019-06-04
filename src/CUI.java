@@ -104,7 +104,7 @@ class CUI {
 
         System.out.println("Vous avez " + argent + " pièces.");
         System.out.println("Liste des batiments que vous pouvez acheter : \n");
-        for(Etablissement etab : ctrl.getPioche()) {
+        for(Etablissement etab : ctrl.getPioche()) { // On affiche tous les établissements qui sont possible à acheter.
             if(etab.getCoutConstruction() <= argent && !etabEstEnregistre(etab, proposes)) {
                 proposes.add(etab);
                 String nomEtab    = String.format("%30s", etab.getNom());
@@ -115,8 +115,8 @@ class CUI {
                 indice++;
             }
         }
-        for(Carte c : joueurActif.getMain()) {
-            if(c.getCoutConstruction() <= joueurActif.getArgent() && c instanceof Monument && !((Monument) c).estConstruit()) {
+        for(Carte c : joueurActif.getMain()) { // On affiche les monuments à la fin de la liste.
+            if(c.getCoutConstruction() <= argent && c instanceof Monument && !((Monument) c).estConstruit()) {
                 proposes.add(c);
                 String nomEtab    = String.format("%30s", c.getNom());
                 String coutEtab   = String.format("%9s" , c.getCoutConstruction() + " pièces");
@@ -139,17 +139,17 @@ class CUI {
                     break;
                 }
                 choix--;
-                for(Carte c : joueurActif.getMain()) {
-                    if(c.getNom().equals(proposes.get(choix).getNom())) {
-                        if(c instanceof Etablissement) {
-                            joueurActif.ajouteMain(c);
-                            ctrl.removeFromPioche((Etablissement) c);
-                        } else {
-                            ((Monument) c).setConstruit(true);
-                        }
-                        ctrl.getJoueurActif().ajouterArgent(-1*c.getCoutConstruction());
-                        break;
+
+                Carte carteChoisie = proposes.get(choix);
+                if(joueurActif.getArgent() >= carteChoisie.getCoutConstruction()) { // Vérification au cas où, même si ça a déjà été vérifié avant
+                    if(carteChoisie instanceof Etablissement) {
+                        joueurActif.ajouteMain(carteChoisie);
+                        ctrl.removeFromPioche((Etablissement) carteChoisie);
+                    } else {
+                        ((Monument) carteChoisie).setConstruit(true);
                     }
+                    ctrl.getJoueurActif().ajouterArgent(-1*carteChoisie.getCoutConstruction());
+                    break;
                 }
                 System.out.println();
             }catch (Exception e) {
@@ -184,10 +184,10 @@ class CUI {
         System.out.println("Vous avez fait un double ! Vous allez rejouer à la fin de votre tour.");
     }
 
-    private void afficherMain() {
+    void afficherMain(Joueur j) {
         ArrayList<Carte> cartesUniques = new ArrayList<>();
 
-        for(Carte c : joueurActif.getMain()) {
+        for(Carte c : j.getMain()) {
             if(!carteEstEnregistree(c,cartesUniques)) {
                 cartesUniques.add(c);
             }
@@ -195,7 +195,7 @@ class CUI {
 
         for (Carte carteUnique: cartesUniques) {
             int nbCetteCarte = 0;
-            for(Carte c : joueurActif.getMain()) {
+            for(Carte c : j.getMain()) {
                 if(c.equals(carteUnique)) {
                     nbCetteCarte++;
                 }
@@ -208,6 +208,21 @@ class CUI {
             }
         }
         System.out.println("\n\n");
+    }
+
+    private void afficherMain() {afficherMain(joueurActif);}
+
+    void afficherVictoire() {
+        for(int j = 0; j < 1000; j++) System.out.println();
+        System.out.println("PARTIE FINIE ! C'est " + joueurActif.getNom() + " qui a gagné");
+        System.out.println("Ecrivez WOW SUPER pour finir le programme et voir l'argent et la main de chaque joueur.");
+        Scanner sc = new Scanner(System.in);
+        sc.next();
+        sc.close();
+        for(Joueur j : ctrl.getListeJoueurs()) {
+            System.out.println("\t" + j.getNom() + " : \n\tArgent : " +j.getArgent());
+            afficherMain(j);
+        }
     }
 
     void argentChange(Joueur j, String etab, int prevArgent) {

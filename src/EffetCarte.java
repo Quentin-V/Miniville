@@ -85,6 +85,7 @@ abstract class EffetCarte {
 			}
 		}
 		if(argentJoueur != ctrl.getJoueurActif().getArgent()) { ctrl.argentChange(ctrl.getJoueurActif(),"Boulangerie",argentJoueur); }
+		piecesSupplementaires(ctrl, ctrl.getJoueurActif(),"Boulangerie");
 	} // Fait
 
 	private static void cafe(Controleur ctrl) {
@@ -93,23 +94,29 @@ abstract class EffetCarte {
 
 		for(int i = listeJoueurs.indexOf(joueurActif) + 1; i < listeJoueurs.size(); i++) { // On va chercher les joueurs dans l'ordre
 			Joueur j = listeJoueurs.get(i);
+			int nbCafes = 0;
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Café") && joueurActif.getArgent() > 0 ) {
-					ctrl.argentVole(joueurActif, j, "Café", 1);
+					nbCafes++;
 					joueurActif.ajouterArgent(-1);
 					j.ajouterArgent(1);
+					if(joueurActif.getArgent() >= 1) piecesSupplementaires(ctrl, j, "Café");
 				}
 			}
+			if(nbCafes > 0) ctrl.argentVole(joueurActif, j, "Café", nbCafes);
 		}
 		for(int i = 0; i < listeJoueurs.indexOf(joueurActif); i++) { // On repars du début de la liste jusqu'au joueur
 			Joueur j = listeJoueurs.get(i);
+			int nbPiecesVoleesParCafe = 0;
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Café") && joueurActif.getArgent() > 0 ) {
-					ctrl.argentVole(joueurActif, j, "Café", 1);
+					nbPiecesVoleesParCafe++;
 					joueurActif.ajouterArgent(-1);
 					j.ajouterArgent(1);
+					if(joueurActif.getArgent() >= 1) piecesSupplementaires(ctrl, j, "Café");
 				}
 			}
+			if(nbPiecesVoleesParCafe > 0) ctrl.argentVole(joueurActif, j, "Café", nbPiecesVoleesParCafe);
 		}
 	} // Pas terminé
 
@@ -121,6 +128,7 @@ abstract class EffetCarte {
 			}
 		}
 		if(argentJoueur != ctrl.getJoueurActif().getArgent()) { ctrl.argentChange(ctrl.getJoueurActif(),"Superette",argentJoueur); }
+		piecesSupplementaires(ctrl, ctrl.getJoueurActif(),"Supérette");
 	} // Fait
 
 	private static void foret(Controleur ctrl) {
@@ -143,9 +151,11 @@ abstract class EffetCarte {
 						if( j.getArgent() >= 2 ) {
 							j.ajouterArgent(-2);
 							ctrl.getJoueurActif().ajouterArgent(2);
+							ctrl.argentVole(j, ctrl.getJoueurActif(), "Stade", 2);
 						} else if( j.getArgent() >= 1 ) {
 							j.ajouterArgent(-1);
 							ctrl.getJoueurActif().ajouterArgent(1);
+							ctrl.argentVole(j, ctrl.getJoueurActif(), "Stade", 1);
 						}
 					}
 				}
@@ -157,7 +167,7 @@ abstract class EffetCarte {
 
 		for( Carte c : ctrl.getJoueurActif().getMain() ) {
 			if( c.getNom().equals("Chaîne de télévision") ) {
-				System.out.println("Saisissez le nom du joueur à qui vous voulez voler 5 pièces :");
+				System.out.println("Saisissez le nom du joueur à qui vous voulez voler 5 pièces (-1 pour ne pas voler) : ");
 				for(Joueur j : ctrl.getListeJoueurs()) {
 					if( j != ctrl.getJoueurActif() ) {
 						String nomJoueur = String.format("%20s", j.getNom());
@@ -167,29 +177,38 @@ abstract class EffetCarte {
 							try {
 								Scanner sc = new Scanner(System.in);
 								String choix = sc.next();
+								if(choix.equals(ctrl.getJoueurActif().getNom())) throw new IllegalArgumentException();
+								if(choix.equals("-1")) return;
 								for( Joueur j2 : ctrl.getListeJoueurs() ) {
 									if( j2.getNom().equals(choix) ) {
 										if(j2.getArgent() >= 5) {
 											j2.ajouterArgent(-5);
 											ctrl.getJoueurActif().ajouterArgent(5);
+											ctrl.argentVole(j2, ctrl.getJoueurActif(), "Chaine de télé", 5);
 										}else if(j2.getArgent() >= 4) {
 											j2.ajouterArgent(-4);
 											ctrl.getJoueurActif().ajouterArgent(4);
+											ctrl.argentVole(j2, ctrl.getJoueurActif(), "Chaine de télé", 4);
 										}else if(j2.getArgent() >= 3) {
 											j2.ajouterArgent(-3);
 											ctrl.getJoueurActif().ajouterArgent(3);
+											ctrl.argentVole(j2, ctrl.getJoueurActif(), "Chaine de télé", 3);
 										}else if(j2.getArgent() >= 2) {
 											j2.ajouterArgent(-2);
 											ctrl.getJoueurActif().ajouterArgent(2);
+											ctrl.argentVole(j2, ctrl.getJoueurActif(), "Chaine de télé", 2);
 										}else if(j2.getArgent() >= 1) {
 											j2.ajouterArgent(-1);
 											ctrl.getJoueurActif().ajouterArgent(1);
+											ctrl.argentVole(j2, ctrl.getJoueurActif(), "Chaine de télé", 1);
 										}
-										break;
-									} else {System.out.println("Le nom saisi ne correspond pas à un nom de joueur, veuillez réessayer.");}
+										return;
+									}
 								}
-								sc.close();
-							} catch(Exception e) {e.printStackTrace();}
+								System.out.println("Le nom saisi ne correspond pas à un nom de joueur, veuillez réessayer.");
+							}
+							catch(IllegalArgumentException e) {System.out.println("Vous ne pouvez pas vous voler des pièces");}
+							catch(Exception e) {e.printStackTrace();}
 						}
 					}
 				}
@@ -198,6 +217,53 @@ abstract class EffetCarte {
 	} // Pas terminé
 
 	private static void centreDaffaires(Controleur ctrl) {
+
+		// VERIFIER SI LE JOUEUR A LA CARTE AU MOINS
+
+		/*
+		while(true) {
+			System.out.print("Voulez vous échanger une carte avec un autre joueur (O|N) : ");
+			try {
+				Scanner sc = new Scanner(System.in);
+				char choixRelancer = sc.next().charAt(0);
+				System.out.println();
+				if(Character.toLowerCase(choixRelancer) != 'n' && Character.toLowerCase(choixRelancer) != 'o') {
+					throw new Exception();
+				} else if(Character.toLowerCase(choixRelancer) == 'n') {
+					return;
+				} else {break;}
+			} catch(Exception e) {System.out.println("Erreur, veuillez saisir 'O' ou 'N' !"); e.printStackTrace();}
+		}
+
+		System.out.println("Voici les mains de chaque joueur : ");
+		for(Joueur j : ctrl.getListeJoueurs()) {
+			System.out.println("\t" + j.getNom() + " : ");
+			ctrl.afficherMain(j);
+		}
+
+		for(Joueur j : ctrl.getListeJoueurs()) {
+			if(!j.equals(ctrl.getJoueurActif())) System.out.println("\t" + j.getNom() + " | " + j.getArgent());
+		}
+		System.out.print("Ecrivez le nom du joueur à qui vous voulez échanger une carte : ");
+
+		while(true) {
+			try {
+				Scanner sc = new Scanner(System.in);
+				String choix = sc.next();
+				if(choix.equals(ctrl.getJoueurActif().getNom())) throw new IllegalArgumentException();
+				for(Joueur j2 : ctrl.getListeJoueurs()) {
+					if(j2.getNom().equals(choix)) {
+						// ICI AFFICHER LA MAIN ETC POUR ECHANGER LA CARTE
+						return;
+					}
+					System.out.println("Le nom saisi ne correspond pas à un nom de joueur, veuillez réessayer.");
+				}
+			} catch(IllegalArgumentException e) {System.out.println("Vous ne pouvez pas vous échanger une carte.");}
+			  catch(Exception e)                {e.printStackTrace();}
+		}
+		*/
+
+
 
 	} // RIEN DE FAIT ICI
 
@@ -251,31 +317,37 @@ abstract class EffetCarte {
 
 		for(int i = listeJoueurs.indexOf(joueurActif) + 1; i < listeJoueurs.size(); i++) { // On va chercher les joueurs dans l'ordre
 			Joueur j = listeJoueurs.get(i);
+			int nbPiecesPrisesParRestaurant = 0;
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Restaurant") && joueurActif.getArgent() >= 2 ) {
-					ctrl.argentVole(joueurActif, j, "Restaurant", 2);
+					nbPiecesPrisesParRestaurant += 2;
 					joueurActif.ajouterArgent(-2);
 					j.ajouterArgent(2);
+					if(joueurActif.getArgent() >= 1) piecesSupplementaires(ctrl, j, "Restaurant");
 				} else if(c.getNom().equals("Restaurant") && joueurActif.getArgent() >= 1) {
-					ctrl.argentVole(joueurActif, j, "Restaurant", 1);
+					nbPiecesPrisesParRestaurant++;
 					joueurActif.ajouterArgent(-1);
 					j.ajouterArgent(1);
 				}
 			}
+			if(nbPiecesPrisesParRestaurant > 0) ctrl.argentVole(joueurActif, j, "Restaurant", nbPiecesPrisesParRestaurant);
 		}
 		for(int i = 0; i < listeJoueurs.indexOf(joueurActif); i++) { // On repars du début de la liste jusqu'au joueur
 			Joueur j = listeJoueurs.get(i);
+			int nbPiecesPrisesParRestaurant = 0;
 			for(Carte c : j.getMain()) {
 				if( c.getNom().equals("Restaurant") && joueurActif.getArgent() > 0 ) {
-					ctrl.argentVole(joueurActif, j, "Restaurant", 2);
+					nbPiecesPrisesParRestaurant += 2;
 					joueurActif.ajouterArgent(-2);
 					j.ajouterArgent(2);
+					if(joueurActif.getArgent() >= 1) piecesSupplementaires(ctrl, j, "Restaurant");
 				} else if(c.getNom().equals("Restaurant") && joueurActif.getArgent() >= 1) {
-					ctrl.argentVole(joueurActif, j, "Restaurant", 1);
+					nbPiecesPrisesParRestaurant++;
 					joueurActif.ajouterArgent(-1);
 					j.ajouterArgent(1);
 				}
 			}
+			if(nbPiecesPrisesParRestaurant > 0) ctrl.argentVole(joueurActif, j, "Restaurant", nbPiecesPrisesParRestaurant);
 		}
 	} // Pas terminé
 
@@ -306,5 +378,18 @@ abstract class EffetCarte {
 		}
 		if(argentJoueur != ctrl.getJoueurActif().getArgent()) { ctrl.argentChange(ctrl.getJoueurActif(),"Marché de fuits et légumes",argentJoueur); }
 	} // Fait
+
+	private static void piecesSupplementaires(Controleur ctrl, Joueur unJoueur,String carteActivee) {
+		if(unJoueur.getNomMonumentsConstruits().contains("Centre commercial")) {
+			int nbPiecesBonus = 0;
+			for(Carte c : unJoueur.getMain()) {
+				if(c.getNom().equals(carteActivee)) nbPiecesBonus++;
+			}
+			if(nbPiecesBonus > 0) {
+				unJoueur.ajouterArgent(nbPiecesBonus);
+				ctrl.argentChange(unJoueur, "Centre commercial", unJoueur.getArgent() - nbPiecesBonus);
+			}
+		}
+	} // Fait (Effet du centre commercial)
 
 }

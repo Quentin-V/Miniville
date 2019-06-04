@@ -63,7 +63,8 @@ public class Controleur {
 			cui.afficherDe(resultatDe);
 
 			if(cui.veutRelancer()) {
-				lancerDe();
+				resultatDe = lancerDe();
+				cui.afficherDe(resultatDe);
 			} // Relance le dé
 
 			if(joueurActif.getNomMonumentsConstruits().contains("Parc d'attractions") && resultatDe[0] == resultatDe[1]) {
@@ -77,7 +78,10 @@ public class Controleur {
 				construire();
 			}
 
-			if(partieFinie()) break;
+			if(partieFinie()) {
+				cui.afficherVictoire();
+				break;
+			}
 
 		}
 
@@ -94,6 +98,10 @@ public class Controleur {
 		}
 
 		return resultatDe;
+	}
+
+	void afficherMain(Joueur j){
+		cui.afficherMain(j);
 	}
 
 	boolean veutConstruire() {

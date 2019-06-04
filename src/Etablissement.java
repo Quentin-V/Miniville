@@ -23,7 +23,7 @@ class Etablissement extends Carte {
 
 	String getNumerosActivation() {
 
-		String retour = "";
+		String retour;
 
 		if(numerosActivation.size() == 2) {
 			retour = numerosActivation.get(0).toString() + " et " + numerosActivation.get(1).toString();
